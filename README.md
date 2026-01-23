@@ -1,0 +1,2 @@
+# Magmasnapbot
+MAGMA
