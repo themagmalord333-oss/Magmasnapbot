@@ -33,7 +33,7 @@ API_HASH = "bd4c934697e7e91942ac911a5a287b46"
 BOT_TOKEN = "8485202414:AAHkLH8J6F-_nTyyl0SPeTlzgNgWVE1RypE"
 
 # Force Subscribe Config
-FORCE_CHANNEL = "Anysnapupdate"  # Username without @
+FORCE_CHANNEL = "______"  # Username without @
 FORCE_GROUP = "Anysnapsupport"   # Username without @
 
 # Main Manager Bot
