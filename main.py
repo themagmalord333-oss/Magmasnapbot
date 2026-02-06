@@ -33,7 +33,7 @@ API_HASH = "bd4c934697e7e91942ac911a5a287b46"
 BOT_TOKEN = "8485202414:AAGYeBNL8bBHKDpGezB5y8CuUthSv1faB9s"
 
 # Force Subscribe Config
-FORCE_CHANNEL = "______"  # Username without @
+FORCE_CHANNEL = -1003892920891  # Updated with your Channel ID
 FORCE_GROUP = "Anysnapsupport"   # Username without @
 
 # Main Manager Bot
@@ -172,19 +172,15 @@ SPAM_MESSAGES = [
 
 # ==================== HELPER FUNCTIONS ====================
 
-# --- FORCE SUBSCRIBE CHECKER ---
 async def check_force_subscribe(client, message):
     user_id = message.from_user.id
     try:
-        # Check Channel
         await client.get_chat_member(FORCE_CHANNEL, user_id)
-        # Check Group
         await client.get_chat_member(FORCE_GROUP, user_id)
         return True
     except UserNotParticipant:
-        # If not joined, send buttons
         buttons = [
-            [InlineKeyboardButton("📢 Join Channel", url=f"https://t.me/{FORCE_CHANNEL}")],
+            [InlineKeyboardButton("📢 Join Channel", url=f"https://t.me/c/3892920891/1")],
             [InlineKeyboardButton("👥 Join Group", url=f"https://t.me/{FORCE_GROUP}")],
         ]
         await message.reply(
@@ -248,9 +244,9 @@ async def run_spam(client, chat_id, mention, count):
 CAT_ANIMATION = ["🐈",
     "🐈\nWalking...",
     "🐈\nWalking...",
-    "╱|、\n( .. )\n |、˜〵\nじしˍ,)ノ",  # Looking
-    "╱|、\n( > < )\n |、˜〵\nじしˍ,)ノ", # Blink
-    "╱|、\n(˚ˎ 。7\n |、˜〵\nじしˍ,)ノ", # Final Pose
+    "╱|、\n( .. )\n |、˜〵\nじしˍ,)ノ", 
+    "╱|、\n( > < )\n |、˜〵\nじしˍ,)ノ", 
+    "╱|、\n(˚ˎ 。7\n |、˜〵\nじしˍ,)ノ", 
     "╱|、\n(˚ˎ 。7  < Meow! 🎵\n |、˜〵\nじしˍ,)ノ" ]
 FLOWER_BLOOM = ["🌱", "🌿\n🌿\n🌿", "🌷\n🌷\n🌷", "🌹\n🌹\n🌹"]
 ROSE_ART = r"""
@@ -455,6 +451,7 @@ async def myson_handler(client, message):
     await draw_art(message, MYSON_ART)
 
 async def info_cmd(client, message):
+    from pyrogram.enums import UserStatus
     target_id = message.command[1] if len(message.command) > 1 else (message.reply_to_message.from_user.id if message.reply_to_message else "me")
     status_msg = await message.edit("Processing . . .")
     try:
@@ -509,7 +506,7 @@ async def clone_cmd(client, message):
         }
         async for p in client.get_chat_photos("me", limit=1):
             backup_profile[me.id]["photo"] = await client.download_media(p.file_id)
-        
+
         full_t = await client.get_chat(target.id)
         await client.update_profile(first_name=target.first_name or "", last_name=target.last_name or "", bio=full_t.bio or "")
         async for p in client.get_chat_photos(target.id, limit=1):
@@ -580,7 +577,7 @@ async def stop_cmd(client, message):
     global active_spams, tagall_running, auto_reply_users
     active_spams[message.chat.id] = False
     tagall_running[message.chat.id] = False
-    auto_reply_users.clear() # Clear auto replies
+    auto_reply_users.clear() 
     res = await message.edit("🛑 **All Stopped!** (Spam, Tagall & Auto-Reply Cleared)")
     asyncio.create_task(delete_res(res))
 
@@ -597,7 +594,6 @@ async def auto_reply_listener(client, message):
 
 @bot.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message):
-    # FORCE SUBSCRIBE CHECK
     if not await check_force_subscribe(client, message):
         return
 
@@ -624,17 +620,16 @@ async def start_cmd(client, message):
 
 @bot.on_message(filters.command("add") & filters.private)
 async def add_session_handler(client, message):
-    # FORCE SUBSCRIBE CHECK
     if not await check_force_subscribe(client, message):
         return
 
     if len(message.command) < 2:
         await message.reply("❌ Usage: `/add <StringSession>`")
         return
-    
+
     session_string = message.text.split(None, 1)[1]
     msg = await message.reply("🔄 Connecting...")
-    
+
     try:
         new_user = Client(
             name=f"user_{random.randint(1000, 9999)}",
@@ -643,11 +638,10 @@ async def add_session_handler(client, message):
             session_string=session_string,
             in_memory=True
         )
-        
+
         await new_user.start()
         me = await new_user.get_me()
-        
-        # REGISTER HANDLERS
+
         new_user.add_handler(MessageHandler(help_handler, filters.command("help", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(cat_handler, filters.command("cat", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(rose_handler, filters.command("rose", prefixes=".") & filters.me))
@@ -665,21 +659,18 @@ async def add_session_handler(client, message):
         new_user.add_handler(MessageHandler(aanysnap_cmd, filters.command("aanysnap", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(tagall_cmd, filters.command("tagall", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(stop_cmd, filters.command("stop", prefixes=".") & filters.me))
-        
+
         new_user.add_handler(MessageHandler(auto_reply_listener, filters.incoming & ~filters.me))
-        
+
         running_users[me.id] = new_user
-        
+
         await msg.edit(f"✅ **Connected Successfully!**\nUser: {me.first_name}\nID: `{me.id}`\n\nMagma Bot is now active on your account.")
         print(f"User {me.first_name} started.")
-        
+
     except Exception as e:
         await msg.edit(f"❌ **Connection Failed!**\nError: {e}")
 
 print("✅ Magma Manager Bot Online - Force Subscribe Active!")
 
-# Start Flask Keep-Alive
 keep_alive()
-
-# Run the bot
 bot.run()
