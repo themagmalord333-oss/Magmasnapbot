@@ -30,7 +30,7 @@ def keep_alive():
 # ==================== CONFIGURATION ====================
 API_ID = 37314366
 API_HASH = "bd4c934697e7e91942ac911a5a287b46"
-BOT_TOKEN = "8485202414:AAHkLH8J6F-_nTyyl0SPeTlzgNgWVE1RypE"
+BOT_TOKEN = "8485202414:AAGYeBNL8bBHKDpGezB5y8CuUthSv1faB9s"
 
 # Force Subscribe Config
 FORCE_CHANNEL = "______"  # Username without @
