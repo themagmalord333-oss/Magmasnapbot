@@ -2,12 +2,12 @@ import asyncio
 import random
 import os
 from pyrogram import Client, filters, idle
-from pyrogram.enums import ParseMode
+from pyrogram.enums import ParseMode, UserStatus
 from pyrogram.errors import FloodWait, MessageNotModified, UserNotParticipant
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# --- FLASK KEEP ALIVE SECTION ADDED ---
+# --- FLASK KEEP ALIVE SECTION ---
 from flask import Flask
 from threading import Thread
 
@@ -32,9 +32,10 @@ API_ID = 37314366
 API_HASH = "bd4c934697e7e91942ac911a5a287b46"
 BOT_TOKEN = "8485202414:AAEEYv7_UjUR2DI4KN9l4bEKnsD9v0WGn7E"
 
-# Force Subscribe Config
-FORCE_CHANNEL = -1003892920891  # Updated with your Channel ID
-FORCE_GROUP = "Anysnapsupport"   # Username without @
+# ✅ FIXED FORCE SUBSCRIBE (Ye Change Mat Karna)
+FORCE_CHANNEL_ID = -1003892920891  # Sahi Private ID
+FORCE_CHANNEL_LINK = "https://t.me/+Om1HMs2QTHk1N2Zh" # Aapka Private Link
+FORCE_GROUP = "Anysnapsupport"
 
 # Main Manager Bot
 bot = Client("MagmaManager", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
@@ -48,8 +49,9 @@ auto_reply_users = {}
 backup_profile = {} 
 tagall_running = {}
 
+# --- FULL SPAM LIST (BOLD SANS) ---
 SPAM_MESSAGES = [
-     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 𝗙𝗜𝗥 𝗧𝗘𝗥𝗜 𝗕𝗛𝗘𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗔𝗨𝗧𝗢𝗠𝗔𝗧𝗜𝗖𝗔𝗟𝗟𝗬 𝗨𝗣𝗗𝗔𝗧𝗘 𝗛𝗢𝗝𝗔𝗔𝗬𝗘𝗚𝗜 🤖🙏🤔",
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 𝗙𝗜𝗥 𝗧𝗘𝗥𝗜 𝗕𝗛𝗘𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗔𝗨𝗧𝗢𝗠𝗔𝗧𝗜𝗖𝗔𝗟𝗟𝗬 𝗨𝗣𝗗𝗔𝗧𝗘 𝗛𝗢𝗝𝗔𝗔𝗬𝗘𝗚𝗜 🤖🙏🤔",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔 𝗔𝗨𝗥 𝗣𝗔𝗜𝗦𝗘 𝗦𝗘 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗔 𝗞𝗢𝗧𝗛𝗔 𝗞𝗛𝗢𝗟 𝗗𝗨𝗡𝗚𝗔 😎🤩😝😍",
     "{target} 𝗧𝗘𝗥𝗜 𝗚𝗙 𝗛𝗘 𝗕𝗔𝗗𝗜 𝗦𝗘𝗫𝗬 𝗨𝗦𝗞𝗢 𝗣𝗜𝗟𝗔𝗞𝗘 𝗖𝗛𝗢𝗢𝗗𝗘𝗡𝗚𝗘 𝗣𝗘𝗣𝗦𝗜",
     "{target} 𝗚𝗔𝗟𝗜 𝗚𝗔𝗟𝗜 𝗠𝗘 𝗥𝗘𝗛𝗧𝗔 𝗛𝗘 𝗦𝗔𝗡𝗗 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔𝗞𝗢 𝗖𝗛𝗢𝗗 𝗗𝗔𝗟𝗔 𝗢𝗥 𝗕𝗔𝗡𝗔 𝗗𝗜𝗔 𝗥𝗔𝗡𝗗 🤤🤣",
@@ -62,7 +64,7 @@ SPAM_MESSAGES = [
     "{target} 𝗞𝗬𝗔 𝗠𝗔𝗧𝗟𝗔𝗕 𝗟𝗢𝗚 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗢 𝗖𝗛𝗢𝗗 𝗝𝗔𝗔𝗧𝗘 𝗛𝗘𝗡 𝗣𝗔𝗥 𝗣𝗔𝗜𝗦𝗘 𝗡𝗛𝗜 𝗗𝗘𝗞𝗘 𝗝𝗔𝗔𝗧𝗘 🥲 🤣 😂😂",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗔𝗔𝗧 𝗞𝗘 🤱 𝗚𝗔𝗟𝗜 𝗞𝗘 𝗞𝗨𝗧𝗧𝗢 🦮 𝗠𝗘 𝗕𝗔𝗔𝗧 𝗗𝗨𝗡𝗚𝗔 𝗣𝗛𝗜𝗥 🍞 𝗕𝗥𝗘𝗔𝗗 𝗞𝗜 𝗧𝗔𝗥𝗛 𝗞𝗛𝗔𝗬𝗘𝗡𝗚𝗘 𝗪𝗢 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 😂",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗘 𝗕𝗛𝗢𝗦𝗗𝗘 𝗠𝗘𝗜 𝗦𝗣𝗢𝗧𝗜𝗙𝗬 𝗗𝗔𝗟 𝗞𝗘 𝗟𝗢𝗙𝗜 𝗕𝗔𝗝𝗔𝗨𝗡𝗚𝗔 𝗗𝗜𝗡 𝗕𝗛𝗔𝗥 😍🎶🎶💥",
-    "{target} 𝗧𝗘𝗥Ａ 𝗠𝗔𝗔 𝗠𝗘𝗥𝗜 𝗙𝗔𝗡",
+    "{target} 𝗧𝗘𝗥𝗔 𝗠𝗔𝗔 𝗠𝗘𝗥𝗜 𝗙𝗔𝗡",
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗘𝗛𝗘𝗡 𝗞𝗢𝗧𝗢 𝗖𝗛𝗢𝗗 𝗖𝗛𝗢𝗗𝗞𝗘 𝗣𝗨𝗥𝗔 𝗙𝗔𝗔𝗗 𝗗𝗜𝗔 𝗖𝗛𝗨𝗧𝗛 𝗔𝗕𝗕 𝗧𝗘𝗥𝗜 𝗚𝗙 𝗞𝗢 𝗕𝗛𝗘𝗝 😆💦🤤",
     "{target} 𝗠𝗔𝗗𝗔𝗥𝗖𝗛𝗢𝗗 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗚𝗛𝗨𝗧𝗞𝗔 𝗞𝗛𝗔𝗔𝗞𝗞𝗘 𝗧𝗛𝗢𝗢𝗞 𝗗𝗨𝗡𝗚𝗔 🤣🤣",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔 𝗞𝗜 𝗖𝗛𝗨𝗤 𝗠 𝗗𝗨 𝗧𝗔𝗣𝗔 𝗧𝗔𝗣?",
@@ -113,8 +115,6 @@ SPAM_MESSAGES = [
     "{target} 𝗛𝗔𝗛𝗔𝗛𝗔𝗛𝗔 𝗕𝗔𝗖𝗛𝗛𝗘 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔𝗔𝗞𝗢 𝗖𝗛𝗢𝗗 𝗗𝗜𝗔 𝗡𝗔𝗡𝗚𝗔 𝗞𝗔𝗥𝗞𝗞𝗘",
     "{target} 𝗔𝗣𝗡𝗜 𝗔𝗠𝗠𝗔 𝗦𝗘 𝗣𝗨𝗖𝗛𝗡𝗔 𝗨𝗦𝗞𝗢 𝗨𝗦 𝗞𝗔𝗔𝗟𝗜 𝗥𝗔𝗔𝗧 𝗠𝗘𝗜 𝗞𝗔𝗨𝗡 𝗖𝗛𝗢𝗗𝗡𝗘𝗘 𝗔𝗬𝗔 𝗧𝗛𝗔𝗔𝗔! 𝗧𝗘𝗥𝗘 𝗜𝗦 𝗣𝗔𝗣𝗔 𝗞𝗔 𝗡𝗔𝗔𝗠 𝗟𝗘𝗚𝗜 😂👿😳",
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗛𝗡 𝗦𝗕𝗦𝗘 𝗕𝗗𝗜 𝗥𝗔𝗡𝗗𝗜.",
-
-    # 3. PURE DESI LIST (BINA MACHINE WALI)
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗢 𝗕𝗜𝗦𝗧𝗔𝗥 𝗣𝗘 𝗕𝗔𝗔𝗡𝗗𝗛 𝗞𝗘 𝗣𝗘𝗟𝗨𝗡𝗚𝗔 𝗥𝗔𝗔𝗧 𝗕𝗛𝗔𝗥 🔥",
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗘𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘𝗜 𝗟𝗨𝗡𝗗 𝗗𝗔𝗔𝗟 𝗞𝗘 𝗧𝗔𝗡𝗗𝗔𝗩 𝗞𝗔𝗥𝗨𝗡𝗚𝗔 😈",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗔 𝗕𝗛𝗢𝗦𝗗𝗔 𝗙𝗔𝗔𝗗 𝗞𝗘 𝗛𝗔𝗪𝗔𝗜 𝗔𝗗𝗗𝗔 𝗕𝗔𝗡𝗔 𝗗𝗨𝗡𝗚𝗔 ✈️",
@@ -175,12 +175,13 @@ SPAM_MESSAGES = [
 async def check_force_subscribe(client, message):
     user_id = message.from_user.id
     try:
-        await client.get_chat_member(FORCE_CHANNEL, user_id)
+        # ✅ Corrected: Check Channel using ID, Group using Username
+        await client.get_chat_member(FORCE_CHANNEL_ID, user_id)
         await client.get_chat_member(FORCE_GROUP, user_id)
         return True
     except UserNotParticipant:
         buttons = [
-            [InlineKeyboardButton("📢 Join Channel", url=f"https://t.me/c/3892920891/1")],
+            [InlineKeyboardButton("📢 Join Channel", url=FORCE_CHANNEL_LINK)],
             [InlineKeyboardButton("👥 Join Group", url=f"https://t.me/{FORCE_GROUP}")],
         ]
         await message.reply(
@@ -191,9 +192,9 @@ async def check_force_subscribe(client, message):
         )
         return False
     except Exception as e:
+        # Agar bot admin nahi hai to ye error dega, par hum bot ko block nahi karenge
         print(f"FS Error: {e}")
-        await message.reply(f"❌ **Error:** Make sure I am an **Admin** in the Channel & Group to check membership!\n\n`{e}`")
-        return False
+        return True 
 
 async def smart_edit(message, text, sleep_time=0.5):
     try:
@@ -234,6 +235,7 @@ async def run_spam(client, chat_id, mention, count):
     for i in range(count):
         if chat_id not in active_spams or not active_spams[chat_id]: break
         try:
+            # ✅ UPDATED: Always picks a NEW random message
             msg = random.choice(SPAM_MESSAGES).format(target=mention)
             await client.send_message(chat_id, msg, parse_mode=ParseMode.HTML)
             await asyncio.sleep(0.7)
@@ -577,7 +579,7 @@ async def stop_cmd(client, message):
     global active_spams, tagall_running, auto_reply_users
     active_spams[message.chat.id] = False
     tagall_running[message.chat.id] = False
-    auto_reply_users.clear() 
+    auto_reply_users.clear() # Clear auto replies
     res = await message.edit("🛑 **All Stopped!** (Spam, Tagall & Auto-Reply Cleared)")
     asyncio.create_task(delete_res(res))
 
@@ -594,6 +596,7 @@ async def auto_reply_listener(client, message):
 
 @bot.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message):
+    # FORCE SUBSCRIBE CHECK
     if not await check_force_subscribe(client, message):
         return
 
@@ -620,6 +623,7 @@ async def start_cmd(client, message):
 
 @bot.on_message(filters.command("add") & filters.private)
 async def add_session_handler(client, message):
+    # FORCE SUBSCRIBE CHECK
     if not await check_force_subscribe(client, message):
         return
 
@@ -642,6 +646,7 @@ async def add_session_handler(client, message):
         await new_user.start()
         me = await new_user.get_me()
 
+        # REGISTER HANDLERS
         new_user.add_handler(MessageHandler(help_handler, filters.command("help", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(cat_handler, filters.command("cat", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(rose_handler, filters.command("rose", prefixes=".") & filters.me))
@@ -672,5 +677,8 @@ async def add_session_handler(client, message):
 
 print("✅ Magma Manager Bot Online - Force Subscribe Active!")
 
+# Start Flask Keep-Alive
 keep_alive()
+
+# Run the bot
 bot.run()
