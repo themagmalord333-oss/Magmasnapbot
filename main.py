@@ -1,13 +1,27 @@
+# ---------------------------------------------------------
+# 🚑 CRITICAL FIX: MUST BE AT THE VERY TOP
+# ---------------------------------------------------------
 import asyncio
-import random
 import os
+from threading import Thread
+
+# Fix Loop BEFORE importing Pyrogram to prevent Line 4 Crash
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+# ---------------------------------------------------------
+# NOW IMPORT PYROGRAM (Safe to import now)
+# ---------------------------------------------------------
+import random
+from flask import Flask
 from pyrogram import Client, filters, idle
 from pyrogram.enums import ParseMode, UserStatus
 from pyrogram.errors import FloodWait, MessageNotModified, UserNotParticipant
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from threading import Thread
-from flask import Flask
 
 # ---------------------------------------------------------
 # 🌐 FLASK KEEP ALIVE SECTION
@@ -49,7 +63,7 @@ auto_reply_users = {}
 backup_profile = {} 
 tagall_running = {}
 
-# --- FULL SPAM LIST (SARA DATA WAPAS) ---
+# --- FULL SPAM LIST ---
 SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 𝗙𝗜𝗥 𝗧𝗘𝗥𝗜 𝗕𝗛𝗘𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗔𝗨𝗧𝗢𝗠𝗔𝗧𝗜𝗖𝗔𝗟𝗟𝗬 𝗨𝗣𝗗𝗔𝗧𝗘 𝗛𝗢𝗝𝗔𝗔𝗬𝗘𝗚𝗜 🤖🙏🤔",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔 𝗔𝗨𝗥 𝗣𝗔𝗜𝗦𝗘 𝗦𝗘 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗔 𝗞𝗢𝗧𝗛𝗔 𝗞𝗛𝗢𝗟 𝗗𝗨𝗡𝗚𝗔 😎🤩😝😍",
@@ -150,7 +164,7 @@ SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗘𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘𝗜 𝗣𝗔𝗧𝗧𝗛𝗔𝗥 𝗕𝗛𝗔𝗥 𝗗𝗨𝗡𝗚𝗔 🪨",
 ]
 
-# ==================== ART ASSETS (FULL RESTORED) ====================
+# ==================== ART ASSETS ====================
 CAT_ANIMATION = ["🐈", "🐈\nWalking...", "🐈\nWalking...", "╱|、\n( .. )\n |、˜〵\nじしˍ,)ノ", "╱|、\n( > < )\n |、˜〵\nじしˍ,)ノ", "╱|、\n(˚ˎ 。7\n |、˜〵\nじしˍ,)ノ", "╱|、\n(˚ˎ 。7  < Meow! 🎵\n |、˜〵\nじしˍ,)ノ" ]
 FLOWER_BLOOM = ["🌱", "🌿\n🌿\n🌿", "🌷\n🌷\n🌷", "🌹\n🌹\n🌹"]
 
@@ -605,19 +619,15 @@ async def add_session_handler(client, message):
     except Exception as e:
         await msg.edit(f"❌ **Connection Failed!**\nError: {e}")
 
-print("✅ Magma Manager Bot Online!")
-
 # ---------------------------------------------------------
-# 🚀 MANUAL ASYNCIO START (CRITICAL FIX FOR RENDER)
+# 🚀 START BOT WITH MANUAL LOOP
 # ---------------------------------------------------------
-async def main():
-    await bot.start()
-    print("🤖 Bot Started on Loop!")
-    await idle()
-    await bot.stop()
-
 if __name__ == "__main__":
+    print("✅ Magma Manager Bot Online!")
     keep_alive()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(main())
+    
+    # Since we set the loop at the VERY TOP, we can now just run the bot.
+    # We use loop.run_until_complete to be safe and consistent with the fix.
+    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(bot.run())
