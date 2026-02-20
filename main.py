@@ -1,27 +1,19 @@
-# ---------------------------------------------------------
-# 🚀 RENDER PYTHON 3.14+ CRASH FIX (MONKEY PATCH)
-# Ise sabse upar hi rakhna hai, kisi library se pehle!
-# ---------------------------------------------------------
+# ==============================================================================
+# 🚨 CRITICAL FIX: IN LINES KO KABHI UPAR-NEECHE MAT KARNA!
+# Ye Render ke Python 3.14 ko bypass karne ka pakka ilaj hai.
+# ==============================================================================
 import asyncio
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+# ==============================================================================
 
-def custom_get_event_loop():
-    try:
-        return asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        return loop
-
-# Pyrogram ko dhoka dene ke liye system function hi badal diya
-asyncio.get_event_loop = custom_get_event_loop
-# ---------------------------------------------------------
-
+# Ab baaki saari libraries aaram se load hongi bina kisi crash ke
 import os
 import time
 import random
 from threading import Thread
 from flask import Flask
-from pyrogram import Client, filters
+from pyrogram import Client, filters, idle
 from neonize.client import NewClient
 from neonize.events import MessageEv
 
@@ -147,10 +139,10 @@ async def tg_login(bot, message):
 # ---------------------------------------------------------
 if __name__ == "__main__":
     print("🌐 Starting Flask Web Server...")
-    # Flask ko start karna taaki Render port scan fail na kare
+    # Web server alag se start ho jayega
     Thread(target=run_web, daemon=True).start()
     
-    # Render ko port bind karne ke liye 2 second ka waqt dena
+    # Render ko saans lene ke liye 2 seconds
     time.sleep(2)
     print("✅ Port Bind Successful!")
     
