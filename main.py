@@ -1,22 +1,32 @@
+# ---------------------------------------------------------
+# 🚀 RENDER PYTHON 3.14+ CRASH FIX (MONKEY PATCH)
+# Ise sabse upar hi rakhna hai, kisi library se pehle!
+# ---------------------------------------------------------
+import asyncio
+
+def custom_get_event_loop():
+    try:
+        return asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
+
+# Pyrogram ko dhoka dene ke liye system function hi badal diya
+asyncio.get_event_loop = custom_get_event_loop
+# ---------------------------------------------------------
+
 import os
 import time
 import random
-import asyncio
 from threading import Thread
 from flask import Flask
-from pyrogram import Client, filters, idle
+from pyrogram import Client, filters
 from neonize.client import NewClient
 from neonize.events import MessageEv
 
 # ---------------------------------------------------------
-# 🚑 PYTHON 3.14 EVENT LOOP FIX
-# ---------------------------------------------------------
-# Naye Python versions mein loop aise banana padta hai
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
-
-# ---------------------------------------------------------
-# 🌐 FLASK WEB SERVER (RENDER PORT BIND FIX)
+# 🌐 FLASK WEB SERVER (PORT BIND FIX)
 # ---------------------------------------------------------
 web_app = Flask('')
 @web_app.route('/')
@@ -24,7 +34,6 @@ def home():
     return "ANYSNAP SYSTEM IS 100% ONLINE! 🚀"
 
 def run_web():
-    # Port binding ekdum clear kar di hai
     port = int(os.environ.get("PORT", 10000))
     web_app.run(host='0.0.0.0', port=port)
 
@@ -38,7 +47,7 @@ BOT_TOKEN = "8485202414:AAEEYv7_UjUR2DI4KN9l4bEKnsD9v0WGn7E"
 tg_bot = Client("MagmaManager", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 wa_client = NewClient("magma_wa.db")
 
-# --- 🔥 FULL SPAM LIST ---
+# --- 🔥 FULL SPAM LIST RESTORED ---
 SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 𝗙𝗜𝗥 𝗧𝗘𝗥𝗜 𝗕𝗛𝗘𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗔𝗨𝗧𝗢𝗠𝗔𝗧𝗜𝗖𝗔𝗟𝗟𝗬 𝗨𝗣𝗗𝗔𝗧𝗘 𝗛𝗢𝗝𝗔𝗔𝗬𝗘𝗚𝗜 🤖🙏🤔",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔 𝗔𝗨𝗥 𝗣𝗔𝗜𝗦𝗘 𝗦𝗘 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗔 𝗞𝗢𝗧𝗛𝗔 𝗞𝗛𝗢𝗟 𝗗𝗨𝗡𝗚𝗔 😎🤩😝😍",
@@ -54,7 +63,7 @@ SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗘𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘𝗜 𝗕𝗔𝗥𝗚𝗔𝗗 𝗞𝗔 𝗣𝗘𝗗 𝗨𝗚𝗔 𝗗𝗨𝗡𝗚𝗔𝗔 🌳🤢"
 ]
 
-# --- 🎨 ARTS ---
+# --- 🎨 RESTORED ARTS ---
 HACKER_ART = r"""
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠁⠀⠀⠈⠉⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -63,7 +72,7 @@ HACKER_ART = r"""
 YOURMOM_ART = "🤱 *ANYSNAP VS YOUR MOM* 🤱\nTERI MAA MERI LUND PE! 🥵💋"
 
 # ---------------------------------------------------------
-# 📱 WHATSAPP LOGIC
+# 📱 WHATSAPP COMMANDS & ANIMATIONS
 # ---------------------------------------------------------
 @wa_client.common_types(MessageEv)
 def on_wa_message(client: NewClient, message: MessageEv):
@@ -114,7 +123,7 @@ def on_wa_message(client: NewClient, message: MessageEv):
         client.send_message(chat_id, "🖕 *FUCK OFF!*")
 
 # ---------------------------------------------------------
-# 🤖 TELEGRAM LOGIN
+# 🤖 TELEGRAM LOGIN SYSTEM
 # ---------------------------------------------------------
 @tg_bot.on_message(filters.command("start") & filters.private)
 async def tg_start(bot, message):
@@ -126,7 +135,7 @@ async def tg_login(bot, message):
     msg = await message.reply("🔄 OTP (Pairing Code) request kar raha hoon...")
     try:
         code = wa_client.request_pairing_code(phone)
-        await msg.edit(f"✅ **PAIRING CODE:** `{code}`\n\nIse apne WhatsApp 'Link Devices' mein dalein.")
+        await msg.edit(f"✅ **PAIRING CODE:** `{code}`\n\nIse apne WhatsApp 'Linked Devices' mein dalein.")
         if not wa_client.is_connected:
             wa_client.add_event_handler(MessageEv, on_wa_message)
             Thread(target=wa_client.connect, daemon=True).start()
@@ -134,20 +143,16 @@ async def tg_login(bot, message):
         await msg.edit(f"❌ Error: {str(e)}")
 
 # ---------------------------------------------------------
-# 🚀 LAUNCHER (BULLETPROOF)
+# 🚀 BULLETPROOF LAUNCHER
 # ---------------------------------------------------------
 if __name__ == "__main__":
-    # 1. Start web server completely independently
-    web_thread = Thread(target=run_web, daemon=True)
-    web_thread.start()
+    print("🌐 Starting Flask Web Server...")
+    # Flask ko start karna taaki Render port scan fail na kare
+    Thread(target=run_web, daemon=True).start()
     
-    # 2. Give web server 2 seconds to bind port before heavy lifting
+    # Render ko port bind karne ke liye 2 second ka waqt dena
     time.sleep(2)
-    print("✅ Web Server is running and port is bound!")
-
-    # 3. Start Pyrogram safely
-    try:
-        print("✅ Starting ANYSNAP Telegram Bot...")
-        tg_bot.run()
-    except Exception as e:
-        print(f"❌ Fatal Error: {e}")
+    print("✅ Port Bind Successful!")
+    
+    print("🤖 Starting Telegram Bot...")
+    tg_bot.run()
