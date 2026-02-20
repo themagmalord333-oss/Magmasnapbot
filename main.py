@@ -9,13 +9,22 @@ from neonize.client import NewClient
 from neonize.events import MessageEv
 
 # ---------------------------------------------------------
-# 🌐 FLASK KEEP ALIVE (Render Web Server)
+# 🚑 PYTHON 3.14 EVENT LOOP FIX
+# ---------------------------------------------------------
+# Naye Python versions mein loop aise banana padta hai
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+# ---------------------------------------------------------
+# 🌐 FLASK WEB SERVER (RENDER PORT BIND FIX)
 # ---------------------------------------------------------
 web_app = Flask('')
 @web_app.route('/')
-def home(): return "ANYSNAP ULTIMATE IS RUNNING! 🚀"
+def home(): 
+    return "ANYSNAP SYSTEM IS 100% ONLINE! 🚀"
 
 def run_web():
+    # Port binding ekdum clear kar di hai
     port = int(os.environ.get("PORT", 10000))
     web_app.run(host='0.0.0.0', port=port)
 
@@ -29,7 +38,7 @@ BOT_TOKEN = "8485202414:AAEEYv7_UjUR2DI4KN9l4bEKnsD9v0WGn7E"
 tg_bot = Client("MagmaManager", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 wa_client = NewClient("magma_wa.db")
 
-# --- 🔥 FULL RESTORED SPAM LIST ---
+# --- 🔥 FULL SPAM LIST ---
 SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 𝗙𝗜𝗥 𝗧𝗘𝗥𝗜 𝗕𝗛𝗘𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗔𝗨𝗧𝗢𝗠𝗔𝗧𝗜𝗖𝗔𝗟𝗟𝗬 𝗨𝗣𝗗𝗔𝗧𝗘 𝗛𝗢𝗝𝗔𝗔𝗬𝗘𝗚𝗜 🤖🙏🤔",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔 𝗔𝗨𝗥 𝗣𝗔𝗜𝗦𝗘 𝗦𝗘 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗔 𝗞𝗢𝗧𝗛𝗔 𝗞𝗛𝗢𝗟 𝗗𝗨𝗡𝗚𝗔 😎🤩😝😍",
@@ -45,7 +54,7 @@ SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗘𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘𝗜 𝗕𝗔𝗥𝗚𝗔𝗗 𝗞𝗔 𝗣𝗘𝗗 𝗨𝗚𝗔 𝗗𝗨𝗡𝗚𝗔𝗔 🌳🤢"
 ]
 
-# --- 🎨 RESTORED ARTS ---
+# --- 🎨 ARTS ---
 HACKER_ART = r"""
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠁⠀⠀⠈⠉⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿
@@ -54,7 +63,7 @@ HACKER_ART = r"""
 YOURMOM_ART = "🤱 *ANYSNAP VS YOUR MOM* 🤱\nTERI MAA MERI LUND PE! 🥵💋"
 
 # ---------------------------------------------------------
-# 📱 WHATSAPP COMMANDS & ANIMATIONS
+# 📱 WHATSAPP LOGIC
 # ---------------------------------------------------------
 @wa_client.common_types(MessageEv)
 def on_wa_message(client: NewClient, message: MessageEv):
@@ -105,7 +114,7 @@ def on_wa_message(client: NewClient, message: MessageEv):
         client.send_message(chat_id, "🖕 *FUCK OFF!*")
 
 # ---------------------------------------------------------
-# 🤖 TELEGRAM LOGIN SYSTEM
+# 🤖 TELEGRAM LOGIN
 # ---------------------------------------------------------
 @tg_bot.on_message(filters.command("start") & filters.private)
 async def tg_start(bot, message):
@@ -125,20 +134,20 @@ async def tg_login(bot, message):
         await msg.edit(f"❌ Error: {str(e)}")
 
 # ---------------------------------------------------------
-# 🚀 ADVANCED LAUNCHER (PYTHON 3.11+ FIX)
+# 🚀 LAUNCHER (BULLETPROOF)
 # ---------------------------------------------------------
-async def main():
-    # 1. Flask ko alag thread mein shuru karna
-    Thread(target=run_web, daemon=True).start()
-    
-    # 2. Telegram Bot ko proper async loop mein start karna
-    await tg_bot.start()
-    print("✅ System Fully Online & Ready!")
-    
-    # 3. Bot ko zinda rakhna bina crash huye
-    await idle()
-    await tg_bot.stop()
-
 if __name__ == "__main__":
-    # Naye tareeke se event loop chalana jo Render par fail nahi hoga
-    asyncio.run(main())
+    # 1. Start web server completely independently
+    web_thread = Thread(target=run_web, daemon=True)
+    web_thread.start()
+    
+    # 2. Give web server 2 seconds to bind port before heavy lifting
+    time.sleep(2)
+    print("✅ Web Server is running and port is bound!")
+
+    # 3. Start Pyrogram safely
+    try:
+        print("✅ Starting ANYSNAP Telegram Bot...")
+        tg_bot.run()
+    except Exception as e:
+        print(f"❌ Fatal Error: {e}")
