@@ -1,84 +1,132 @@
+import os
 import time
 import random
+from threading import Thread
+from flask import Flask
+from pyrogram import Client, filters
 from neonize.client import NewClient
 from neonize.events import MessageEv
-from neonize.types import Message
 
-# --- CONFIGURATION & SESSION ---
-client = NewClient("magma_wa_session.db")
+# --- 🌐 RENDER KEEP ALIVE ---
+app = Flask('')
+@app.route('/')
+def home(): return "ANYSNAP ULTIMATE IS ONLINE! 🚀"
 
-# --- SPAM MESSAGES (Telegram Wale) ---
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+# --- ⚙️ CONFIGURATION ---
+API_ID = 37314366
+API_HASH = "bd4c934697e7e91942ac911a5a287b46"
+BOT_TOKEN = "8485202414:AAEEYv7_UjUR2DI4KN9l4bEKnsD9v0WGn7E"
+
+tg_bot = Client("MagmaManager", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+wa_client = NewClient("magma_wa.db")
+
+# --- 🔥 FULL SPAM LIST RESTORED ---
 SPAM_MESSAGES = [
-    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔...",
-    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔...",
-    "{target} 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗨𝗧 𝗠𝗘𝗜 𝗔𝗣𝗣𝗟𝗘 𝗞𝗔 𝟭𝟴𝗪 𝗪𝗔𝗟𝗔 𝗖𝗛𝗔𝗥𝗚𝗘𝗥...",
-    # (Aap baki ki list yahan copy-paste kar sakte hain)
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗖𝗛𝗔𝗡𝗚𝗘𝗦 𝗖𝗢𝗠𝗠𝗜𝗧 𝗞𝗥𝗨𝗚𝗔 🤖🙏🤔",
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗨𝗠𝗠𝗬 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗞𝗢 𝗢𝗡𝗟𝗜𝗡𝗘 𝗢𝗟𝗫 𝗣𝗘 𝗕𝗘𝗖𝗛𝗨𝗡𝗚𝗔 😎🤩😝😍",
+    "{target} 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗨𝗧 𝗠𝗘𝗜 𝗔𝗣𝗣🇱🇪 𝗞𝗔 𝟭𝟴𝗪 𝗪𝗔𝗟𝗔 𝗖𝗛𝗔𝗥𝗚𝗘𝗥 🔥🤩",
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘🇮 𝗕𝗔𝗧𝗧𝗘𝗥𝗬 𝗟𝗔𝗚𝗔 𝗞𝗘 𝗣𝗢𝗪𝗘𝗥𝗕𝗔𝗡𝗞 𝗕𝗔𝗡𝗔 𝗗𝗨𝗡𝗚𝗔 🔋",
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗘 𝗕𝗛𝗢𝗦𝗗𝗘 𝗠𝗘𝗜 𝗦𝗣𝗢𝗧𝗜𝗙𝗬 𝗗𝗔𝗟 𝗞𝗘 𝗟𝗢𝗙𝗜 𝗕𝗔𝗝𝗔𝗨𝗡𝗚𝗔 😍🎶",
+    "{target} 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘𝗜 𝗕𝗔𝗥𝗚𝗔𝗗 𝗞𝗔 𝗣𝗘𝗗 𝗨𝗚𝗔 𝗗𝗨𝗡𝗚𝗔𝗔 🌳🤢",
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 ✋ 𝗛𝗔𝗧𝗧𝗛 𝗗𝗔𝗟𝗞𝗘 👶 𝗕𝗔𝗖𝗖𝗛𝗘 𝗡𝗜𝗞𝗔𝗟 𝗗𝗨𝗡𝗚𝗔 😍"
 ]
 
-# --- ASCII ARTS ---
-HACKER_ART = "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠁...\n(Full Hacker Art Here)"
-YOURMOM_ART = "🤱 *ANYSNAP VS YOUR MOM* 🤱\nTERI MAA MERI LUND PE! 🥵"
-
-@client.common_types(MessageEv)
-def on_message(client: NewClient, message: MessageEv):
+# --- 📱 WHATSAPP COMMANDS & ANIMATIONS ---
+@wa_client.common_types(MessageEv)
+def on_wa_message(client: NewClient, message: MessageEv):
     text = message.Message.conversation or message.Message.extendedTextMessage.text or ""
     chat_id = message.Info.MessageSource.Chat
-    sender_name = message.Info.PushName or "User"
+    sender = message.Info.PushName or "User"
 
     # .help Command
     if text == ".help":
-        help_menu = """
-🔥 *MAGMA WA USERBOT* 🔥
+        menu = """🔥 *ANYSNAP ULTIMATE WA* 🔥
 
-🌹 `.rose` - Rose Animation
-💻 `.hacker` - System Hack
-⚠️ `.error` - System Crash
-🖕 `.fuck` - Fuck Art
+🚀 `.anysnap <count>` - Full Spam
+🌹 `.rose` - Flower Bloom
+🦋 `.butterfly` - Butterfly Art
+🐱 `.cat` - Meow Animation
+❤️ `.love` - Heart Animation
+💻 `.hacker` - Hack System
+🖕 `.fuck` - Fuck You
 🤱 `.yourmom` - Mom Roast
-🚀 `.anysnap <count>` - Spam
-"""
-        client.send_message(chat_id, help_menu)
+ℹ️ `.info` - User Info"""
+        client.send_message(chat_id, menu)
 
-    # .anysnap (Spam)
+    # .anysnap Spam
     elif text.startswith(".anysnap"):
         try:
-            count = int(text.split()[1]) if len(text.split()) > 1 else 5
+            count = int(text.split()[1]) if len(text.split()) > 1 else 10
             for _ in range(count):
-                msg = random.choice(SPAM_MESSAGES).format(target=sender_name)
+                msg = random.choice(SPAM_MESSAGES).format(target=sender)
                 client.send_message(chat_id, msg)
-                time.sleep(0.8)
+                time.sleep(0.7)
         except: pass
 
-    # Animations & Arts
+    # .rose Animation
     elif text == ".rose":
-        client.send_message(chat_id, "🌱")
+        for stage in ["🌱", "🌿", "🌷", "🌹 *FOR YOU!*"]:
+            client.send_message(chat_id, stage)
+            time.sleep(0.5)
+
+    # .love Animation
+    elif text == ".love":
+        for heart in ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "💖 *I LOVE YOU*"]:
+            client.send_message(chat_id, heart)
+            time.sleep(0.4)
+
+    # .cat Animation
+    elif text == ".cat":
+        for frame in ["🐈", "🐾", "🐈‍⬛", "🐱 *Meow!*"]:
+            client.send_message(chat_id, frame)
+            time.sleep(0.5)
+
+    # .butterfly Art
+    elif text == ".butterfly":
+        client.send_message(chat_id, "🦋 *Flying...*")
         time.sleep(0.5)
-        client.send_message(chat_id, "🌹 *FOR YOU!*")
+        client.send_message(chat_id, "``` Ƹ̵̡Ӝ̵̨̄Ʒ ```")
 
+    # .hacker Art
     elif text == ".hacker":
-        client.send_message(chat_id, "💻 *Hacking System...*")
+        client.send_message(chat_id, "💻 *HACKING...*")
         time.sleep(1)
-        client.send_message(chat_id, f"```{HACKER_ART}```\n\n✅ *SYSTEM HACKED!*")
+        client.send_message(chat_id, "```[■■■■■■■■■□] 99%```")
+        time.sleep(1)
+        client.send_message(chat_id, "✅ *DATABASE HACKED!*")
 
-    elif text == ".fuck":
-        client.send_message(chat_id, "🖕 *FUCK YOU!*")
+    # .info Command
+    elif text == ".info":
+        info = f"""👤 *USER INFO*
+📝 *Name:* {sender}
+🆔 *ID:* `{chat_id.split('@')[0]}`
+📱 *Device:* WhatsApp Userbot
+🚀 *Powered By:* Magma Manager"""
+        client.send_message(chat_id, info)
 
-    elif text == ".yourmom":
-        client.send_message(chat_id, YOURMOM_ART)
+# --- 🤖 TELEGRAM OTP SYSTEM ---
+@tg_bot.on_message(filters.command("start") & filters.private)
+async def tg_start(bot, message):
+    await message.reply("🔥 **ANYSNAP HYBRID BOT** 🔥\n\nWhatsApp Login ke liye apna number bhejein.\nExample: `+919876543210`")
 
-# --- OTP LOGIN SYSTEM ---
-def start_bot():
-    if not client.is_connected:
-        print("\n" + "="*40)
-        phone = input("📞 WhatsApp Number (e.g. 919876543210): ")
-        print("🔄 OTP Code Request kar raha hoon...")
-        code = client.request_pairing_code(phone)
-        print(f"\n🔥 LOGIN OTP: {code}")
-        print("👉 WhatsApp -> Linked Devices -> Link with Phone Number mein dalo.")
-        print("="*40 + "\n")
-
-    client.add_event_handler(MessageEv, on_message)
-    client.connect()
+@tg_bot.on_message(filters.text & filters.private)
+async def tg_login(bot, message):
+    phone = message.text.strip().replace("+", "")
+    msg = await message.reply("🔄 OTP Request kar raha hoon...")
+    try:
+        code = wa_client.request_pairing_code(phone)
+        await msg.edit(f"✅ **PAIRING CODE:** `{code}`\n\nIs code ko WhatsApp mein dalein. Bot active ho jayega!")
+        if not wa_client.is_connected:
+            wa_client.add_event_handler(MessageEv, on_wa_message)
+            Thread(target=wa_client.connect).start()
+    except Exception as e:
+        await msg.edit(f"❌ Error: {str(e)}")
 
 if __name__ == "__main__":
-    start_bot()
+    Thread(target=run_web).start()
+    print("✅ System Online!")
+    tg_bot.run()
