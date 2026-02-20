@@ -9,16 +9,20 @@ from neonize.client import NewClient
 from neonize.events import MessageEv
 
 # ---------------------------------------------------------
-# 🚑 CRITICAL FIX: Loop setup before everything
+# 🚑 CRITICAL FIX: Loop setup before everything else
 # ---------------------------------------------------------
-try:
-    asyncio.get_running_loop()
-except RuntimeError:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+def setup_loop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop
+
+loop = setup_loop()
 
 # ---------------------------------------------------------
-# 🌐 FLASK KEEP ALIVE
+# 🌐 FLASK KEEP ALIVE (For Render)
 # ---------------------------------------------------------
 app = Flask('')
 @app.route('/')
@@ -29,12 +33,13 @@ def run_web():
     app.run(host='0.0.0.0', port=port)
 
 # ---------------------------------------------------------
-# ⚙️ CONFIGURATION
+# ⚙️ CONFIGURATION & CLIENTS
 # ---------------------------------------------------------
 API_ID = 37314366
 API_HASH = "bd4c934697e7e91942ac911a5a287b46"
 BOT_TOKEN = "8485202414:AAEEYv7_UjUR2DI4KN9l4bEKnsD9v0WGn7E"
 
+# Initialize Clients
 tg_bot = Client("MagmaManager", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 wa_client = NewClient("magma_wa.db")
 
@@ -46,15 +51,13 @@ SPAM_MESSAGES = [
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘🇮 𝗕𝗔𝗧𝗧𝗘𝗥𝗬 𝗟𝗔𝗚𝗔 𝗞𝗘 𝗣𝗢𝗪𝗘𝗥𝗕𝗔𝗡𝗞 𝗕𝗔𝗡𝗔 𝗗𝗨𝗡𝗚𝗔 🔋",
     "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗘 𝗕𝗛𝗢𝗦𝗗𝗘 𝗠𝗘𝗜 𝗦𝗣𝗢𝗧𝗜𝗙𝗬 𝗗𝗔𝗟 𝗞𝗘 𝗟𝗢𝗙𝗜 𝗕𝗔𝗝𝗔𝗨𝗡𝗚𝗔 😍🎶",
     "{target} 𝗧𝗘𝗥𝗜 𝗕𝗔𝗛𝗘𝗡 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘𝗜 𝗕𝗔𝗥𝗚𝗔𝗗 𝗞𝗔 𝗣𝗘𝗗 𝗨𝗚𝗔 𝗗𝗨𝗡𝗚𝗔𝗔 🌳🤢",
-    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 ✋ 𝗛𝗔𝗧𝗧𝗛 𝗗𝗔𝗟𝗞𝗘 👶 𝗕𝗔𝗖𝗖𝗛𝗘 𝗡𝗜𝗞𝗔𝗟 𝗗𝗨𝗡𝗚𝗔 😍",
-    "{target} 𝗠𝗔𝗗𝗔𝗥𝗖𝗛𝗢𝗗 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 𝗚𝗛𝗨𝗧𝗞𝗔 𝗞𝗛𝗔𝗔𝗞𝗞𝗘 𝗧𝗛𝗢𝗢𝗞 𝗗𝗨𝗡𝗚𝗔 🤣🤣"
+    "{target} 𝗧𝗘𝗥𝗜 𝗠𝗔𝗔 𝗞𝗜 𝗖𝗛𝗨𝗧 𝗠𝗘 ✋ 𝗛𝗔𝗧𝗧𝗛 𝗗𝗔𝗟𝗞𝗘 👶 𝗕𝗔𝗖𝗖𝗛𝗘 𝗡𝗜𝗞𝗔𝗟 𝗗𝗨𝗡𝗚𝗔 😍"
 ]
 
 # --- 🎨 RESTORED ARTS ---
 HACKER_ART = r"""
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠁⠀⠀⠈⠉⠙⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⣿⣿⣿
 """
 YOURMOM_ART = "🤱 *ANYSNAP VS YOUR MOM* 🤱\nTERI MAA MERI LUND PE! 🥵💋"
 
@@ -92,34 +95,23 @@ def on_wa_message(client: NewClient, message: MessageEv):
         for stage in ["🌱", "🌿", "🌷", "🌹 *FOR YOU!*"]:
             client.send_message(chat_id, stage); time.sleep(0.5)
 
-    elif text == ".love":
-        for heart in ["❤️", "🧡", "💛", "💚", "💙", "💜", "💖 *I LOVE YOU*"]:
-            client.send_message(chat_id, heart); time.sleep(0.4)
-
-    elif text == ".cat":
-        for frame in ["🐈", "🐾", "🐈‍⬛", "🐱 *Meow!*"]:
-            client.send_message(chat_id, frame); time.sleep(0.5)
-
     elif text == ".hacker":
         client.send_message(chat_id, f"💻 *HACKING...*\n```\n{HACKER_ART}\n```\n✅ *DATABASE HACKED!*")
-
-    elif text == ".yourmom":
-        client.send_message(chat_id, YOURMOM_ART)
 
 # ---------------------------------------------------------
 # 🤖 TELEGRAM LOGIN SYSTEM
 # ---------------------------------------------------------
 @tg_bot.on_message(filters.command("start") & filters.private)
 async def tg_start(bot, message):
-    await message.reply("🔥 **ANYSNAP HYBRID BOT** 🔥\n\nWhatsApp Login ke liye apna number bhejein.\nExample: `+919876543210`")
+    await message.reply("🔥 **ANYSNAP HYBRID BOT** 🔥\n\nWhatsApp Number bhejein login ke liye.\nExample: `+919876543210`")
 
 @tg_bot.on_message(filters.text & filters.private)
 async def tg_login(bot, message):
     phone = message.text.strip().replace("+", "")
-    msg = await message.reply("🔄 OTP (Pairing Code) request kar raha hoon...")
+    msg = await message.reply("🔄 OTP Request kar raha hoon...")
     try:
         code = wa_client.request_pairing_code(phone)
-        await msg.edit(f"✅ **PAIRING CODE:** `{code}`\n\nIs code ko WhatsApp mein Link Devices mein dalein.")
+        await msg.edit(f"✅ **PAIRING CODE:** `{code}`\n\nIse WhatsApp mein Link Devices mein dalein.")
         if not wa_client.is_connected:
             wa_client.add_event_handler(MessageEv, on_wa_message)
             Thread(target=wa_client.connect).start()
@@ -130,6 +122,8 @@ async def tg_login(bot, message):
 # 🚀 LAUNCH
 # ---------------------------------------------------------
 if __name__ == "__main__":
-    Thread(target=run_web).start()
-    print("✅ System Online!")
+    # Start Flask Web Server
+    Thread(target=run_web, daemon=True).start()
+    
+    print("✅ System Online! Starting Telegram Bot...")
     tg_bot.run()
