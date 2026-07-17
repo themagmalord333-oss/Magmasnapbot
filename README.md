@@ -20,6 +20,11 @@
 
 </div>
 
+## 🔗 The Magma Ecosystem
+This project is an essential part of the **Magma Ecosystem**. It is built to seamlessly integrate with our other powerful tools, including [Magmasting](https://github.com/themagmalord333-oss/Magmasting). Use them together to unlock the ultimate Telegram automation experience!
+
+---
+
 ## 📖 Table of Contents
 - [About the Project](#-about-the-project)
 - [Key Features](#-key-features)
@@ -226,7 +231,5 @@ Telegram Owner
 Telegram Community
 
 GitHub
+Connected Ecosystem: Magmasting
 </div>
-```
-
-```
